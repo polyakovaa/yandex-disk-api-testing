@@ -1,0 +1,14 @@
+[project]
+name = "a.polyakova"
+version = "1.0.0"
+requires-python = ">=3.10"
+dependencies = [
+    "pytest==7.4.4",
+    "py-selenium-auto==0.4.7",
+    "pydantic>=2.10",
+    "pydantic-settings==2.14.2",
+    "Faker==40.36.0",
+    "requests==2.34.2",
+    "python-dotenv==1.2.2",
+    "pytest-check==2.9.1",
+]

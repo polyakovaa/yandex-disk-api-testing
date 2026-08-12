@@ -1,0 +1,8 @@
+{
+  "text_content_length": 10,
+  "ext_before": "txt",
+  "ext_after": "jpg",
+  "img_file": "test.jpg",
+  "trash_page_size": 20,
+  "trash_sort": "-deleted"
+}

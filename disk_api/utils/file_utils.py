@@ -1,0 +1,16 @@
+from pathlib import Path
+
+
+class FileUtils:
+    _PROJECT_MARKERS = ("pyproject.toml", "requirements.txt")
+
+    @classmethod
+    def find_project_root(cls, start: Path | None = None) -> Path:
+        current = (start or Path(__file__)).resolve()
+        if current.is_file():
+            current = current.parent
+        for parent in [current, *current.parents]:
+            if any((parent / marker).exists() for marker in cls._PROJECT_MARKERS):
+                return parent
+        raise FileNotFoundError(
+            "File not Found by pyproject.toml / requirements.txt")
