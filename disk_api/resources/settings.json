@@ -24,7 +24,7 @@
         "Performance": "All"
       },
       "excludedArguments": ["enable-automation"],
-      "startArguments": [],
+      "startArguments": ["--incognito"],
       "pageLoadStrategy": "normal"
     },
     "firefox": {
@@ -34,7 +34,7 @@
       "options": {},
       "loggingPreferences": {},
       "excludedArguments": [],
-      "startArguments": [],
+      "startArguments": ["-private"],
       "pageLoadStrategy": "normal"
     }
   },

@@ -6,3 +6,5 @@ class QueryParams:
     LIMIT = "limit"
     OFFSET = "offset"
     SORT = "sort"
+    FILENAME = "filename"
+    CONTENT_TYPE = "content_type"

@@ -6,7 +6,7 @@ class MainPage(Form):
     def __init__(self):
         super().__init__(
             Locator.by_xpath(
-                "//*[contains(@href,'disk.yandex.ru')]//*[text()='Войти']"),
+                "//*[contains(@href,'disk.yandex.ru')]"),
             "Main page",
         )
 
