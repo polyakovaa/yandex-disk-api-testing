@@ -1,6 +1,6 @@
 {
   "startUrl": "https://disk.yandex.ru/",
-  "browserName": "chrome",
+  "browserName": "firefox",
   "isRemote": false,
   "remoteConnectionUtl": "http://localhost:4444/wd/hub",
   "isElementHighlightEnabled": true,
@@ -28,10 +28,11 @@
       "pageLoadStrategy": "normal"
     },
     "firefox": {
-      "useWebdriver_manager": true,
       "webDriverVersion": "Latest",
       "capabilities": {},
-      "options": {},
+      "options": {
+        "intl.accept_languages": "en"
+      },
       "loggingPreferences": {},
       "excludedArguments": [],
       "startArguments": ["-private"],

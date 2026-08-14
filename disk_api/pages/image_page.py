@@ -6,23 +6,10 @@ from pages.element_attribute import ElementAttribute
 class ImagePage(Form):
     def __init__(self):
         super().__init__(
-            Locator.by_xpath(
-                "//img[contains(@class,'scalable-preview__image')]"),
+            Locator.by_xpath("//img[@src]"),
             "Image page",
         )
-        self.__image = self._element_factory.get_label(
-            Locator.by_xpath(
-                "//img[contains(@class,'scalable-preview__image')]"),
-            "Image",
-        )
-        self.__close_button = self._element_factory.get_button(
-            Locator.by_xpath(
-                "//button[contains(@class,'slider__button_close')]"),
-            "Close img",
-        )
+        self.__image = self._element_factory.get_label(self.locator, "Image")
 
     def get_img_src(self) -> str:
         return self.__image.get_attribute(ElementAttribute.SRC)
-
-    def close_img(self):
-        self.__close_button.click()

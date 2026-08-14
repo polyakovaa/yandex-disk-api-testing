@@ -6,5 +6,4 @@ class ModelTestData(BaseModel):
     ext_before: str
     ext_after: str
     img_file: str
-    trash_page_size: int
     trash_sort: str

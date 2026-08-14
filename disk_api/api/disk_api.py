@@ -42,41 +42,21 @@ class DiskApi(ApiClient):
             },
         )
 
-    def get_resource(self, file_path: str) -> requests.Response:
-        return self.get(
-            Routes.RESOURCES,
-            params={QueryParams.PATH: file_path},
-        )
-
-    def list_trash(self, limit: int, offset: int, sort: str | None = None) -> requests.Response:
-        params = {
-            QueryParams.LIMIT: limit,
-            QueryParams.OFFSET: offset,
-        }
+    def list_trash(self, sort: str | None = None) -> requests.Response:
+        params = {}
         if sort is not None:
             params[QueryParams.SORT] = sort
         return self.get(Routes.TRASH_RESOURCES, params=params)
 
-    def find_in_trash(self, file_name: str, page_size: int, sort: str) -> ResourceMeta | None:
-        offset = 0
-        while True:
-            response = self.list_trash(
-                limit=page_size, offset=offset, sort=sort)
-            if response.status_code != HTTPStatus.OK:
-                return None
-
-            body = TrashListResponse.model_validate(response.json())
-            for item in body.embedded.items:
-                if item.name == file_name:
-                    return item
-
-            if not body.embedded.items or len(body.embedded.items) < page_size:
-                return None
-
-            total = body.embedded.total
-            offset += len(body.embedded.items)
-            if total is not None and offset >= total:
-                return None
+    def find_in_trash(self, file_name: str, sort: str | None = None) -> ResourceMeta | None:
+        response = self.list_trash(sort)
+        if response.status_code != HTTPStatus.OK:
+            return None
+        body = TrashListResponse.model_validate(response.json())
+        for item in body.embedded.items:
+            if item.name == file_name:
+                return item
+        return None
 
     def get_trash_resource(self, file_path: str) -> requests.Response:
         return self.get(

@@ -29,13 +29,19 @@ class LoginPage(Form):
             "Remind later")
 
     def fill_email(self, email: str):
+        self.__email_input.state.wait_for_displayed()
+        self.__email_input.click()
         self.__email_input.clear_and_type(email)
 
     def fill_password(self, password: str):
+        self.__password_input.state.wait_for_displayed()
+        self.__password_input.click()
         self.__password_input.clear_and_type(password)
 
     def click_next(self):
+        self.__next_button.state.wait_for_displayed()
         self.__next_button.click()
 
     def click_remind_later(self):
-        self.__remind_later_button.click()
+        if self.__remind_later_button.state.wait_for_displayed():
+            self.__remind_later_button.click()

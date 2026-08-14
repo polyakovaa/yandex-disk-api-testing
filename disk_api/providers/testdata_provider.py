@@ -5,13 +5,12 @@ from utils.file_utils import FileUtils
 
 class ModelTestDataProvider:
     __instance: ModelTestData | None = None
-    FILE_PATH = "resources/test_data.json"
+    FILE_NAME = "test_data.json"
 
     @classmethod
     def __initialize(cls) -> None:
         if cls.__instance is None:
-            root = FileUtils.find_project_root()
-            data_path = root / cls.FILE_PATH
+            data_path = FileUtils.resource_path(cls.FILE_NAME)
             cls.__instance = FileDataReader.parse_json(data_path, ModelTestData)
 
     @classmethod

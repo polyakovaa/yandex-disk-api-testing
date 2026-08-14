@@ -34,7 +34,7 @@ def setup_browser():
 def setup_session():
     work_dir = str(FileUtils.find_project_root())
     os.chdir(work_dir)
-    BrowserServices.Instance.set_startup(Startup())
+    Startup.init_browser()
     yield
 
 

@@ -11,5 +11,5 @@ class Config(BaseSettings):
     base_url: str
     timeout: int
     oauth_token: str
-    login: str
+    email: str
     password: str

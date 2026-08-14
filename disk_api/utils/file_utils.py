@@ -3,6 +3,7 @@ from pathlib import Path
 
 class FileUtils:
     _PROJECT_MARKERS = ("pyproject.toml", "requirements.txt")
+    RESOURCES_DIR = "resources"
 
     @classmethod
     def find_project_root(cls, start: Path | None = None) -> Path:
@@ -14,3 +15,7 @@ class FileUtils:
                 return parent
         raise FileNotFoundError(
             "File not Found by pyproject.toml / requirements.txt")
+
+    @classmethod
+    def resource_path(cls, file_name: str) -> Path:
+        return cls.find_project_root() / cls.RESOURCES_DIR / file_name

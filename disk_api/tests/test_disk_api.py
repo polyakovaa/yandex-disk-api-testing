@@ -1,7 +1,7 @@
 from http import HTTPStatus
-from pathlib import Path
 import logging
 from utils.random_utils import RandomUtils
+from utils.file_utils import FileUtils
 from py_selenium_auto.browsers.browser_services import BrowserServices
 from pages.main_page import MainPage
 from pages.login_page import LoginPage
@@ -35,7 +35,7 @@ class TestDiskApi:
         )
 
         login_steps = LoginSteps(login_page)
-        login_steps.fill_login_form(config.login, config.password)
+        login_steps.fill_login_form(config.email, config.password)
 
         disk_page = DiskPage()
         assert disk_page.state.wait_for_displayed(), (
@@ -84,18 +84,18 @@ class TestDiskApi:
             f"actual {move_response.status_code}"
         )
 
-        logger.info("Step 7: verify file extention changed")
+        logger.info("Step 7: verify file extension changed")
         assert disk_page.is_file_absent(file_txt), (
-            "Extention didn't change from txt"
+            "Extension didn't change from txt"
         )
         assert disk_page.is_file_present(file_img), (
-            "Extention didn't change to jpg"
+            "Extension didn't change to jpg"
         )
 
         logger.info(
             "Step 8: use API upload jpg with same file name from previous step")
 
-        with open(Path("resources") / test_data.img_file, "rb") as image:
+        with open(FileUtils.resource_path(test_data.img_file), "rb") as image:
             overwrite_response = disk_api.upload_file(
                 file_img, image.read(), overwrite=True)
         assert overwrite_response.status_code == HTTPStatus.CREATED, (
@@ -106,6 +106,8 @@ class TestDiskApi:
         logger.info(
             "Step 9: Open the image and verify that it matches the one uploaded. Close the image")
         disk_page.open_image_original(file_img)
+
+        BrowserServices.Instance.browser.tabs.switch_to_last_tab()
         image_page = ImagePage()
         assert image_page.state.wait_for_displayed(), (
             f"{image_page.name} is not opened"
@@ -113,7 +115,7 @@ class TestDiskApi:
         assert ImageUtils.matches_filename(image_page.get_img_src(), file_img), (
             "Opened image does not match uploaded file"
         )
-        image_page.close_img()
+        BrowserServices.Instance.browser.tabs.close_tab()
 
         logger.info("Step 10: drag image to trash")
         disk_page.drag_file_to_trash(file_img)
@@ -123,7 +125,6 @@ class TestDiskApi:
             "Step 11: use API to verify that the file from the previous step is in the trash")
         trash_item = disk_api.find_in_trash(
             file_img,
-            page_size=test_data.trash_page_size,
             sort=test_data.trash_sort,
         )
         assert trash_item is not None, "File not found in trash"
@@ -141,7 +142,7 @@ class TestDiskApi:
             f"actual {restore_response.status_code}"
         )
 
-        logger.info("Step 13: verify image is on the disk again")
+        logger.info("Step 13: verify image is on the disk UI again")
         assert disk_page.is_file_present(file_img), (
             "Image not on the disk"
         )
@@ -154,7 +155,8 @@ class TestDiskApi:
             f"actual {delete_response.status_code}"
         )
 
-        logger.info("Step 15: verify image deleted from disk")
+        logger.info("Step 15: verify image deleted from disk UI")
+        disk_page.sort_files()
         assert disk_page.is_file_absent(file_img), (
-            "Image was not deleted from the disk"
+            "Image is on disk UI"
         )

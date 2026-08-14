@@ -3,8 +3,5 @@ class QueryParams:
     FROM = "from"
     OVERWRITE = "overwrite"
     PERMANENTLY = "permanently"
-    LIMIT = "limit"
-    OFFSET = "offset"
     SORT = "sort"
     FILENAME = "filename"
-    CONTENT_TYPE = "content_type"
