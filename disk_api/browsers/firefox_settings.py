@@ -1,17 +1,17 @@
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from py_selenium_auto.configurations.web_driver_settings.driver_settings import DriverSettings
-
+from enums.browser import BrowserName, BrowserPreference
 
 
 class FirefoxSettings(DriverSettings):
     @property
     def browser_name(self) -> str:
-        return "firefox"
+        return BrowserName.FIREFOX
 
     @property
     def download_dir_capability_key(self) -> str:
-        return "browser.download.dir"
+        return BrowserPreference.FIREFOX_DOWNLOAD_DIR
 
     @property
     def driver_options(self) -> Options:

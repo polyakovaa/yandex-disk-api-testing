@@ -10,6 +10,10 @@ from steps.login_steps import LoginSteps
 from pages.docviewer_page import DocViewerPage
 from pages.image_page import ImagePage
 from utils.image_utils import ImageUtils
+from utils.browser_utils import BrowserUtils
+from models.upload_link import UploadLink
+from models.resource_meta import TrashListResponse
+from enums.trash_sort import TrashSort
 
 logger = logging.getLogger(__name__)
 
@@ -51,9 +55,14 @@ class TestDiskApi:
 
         file_txt = f"{base_name}.{test_data.ext_before}"
 
-        upload_response = disk_api.upload_file(
-            file_txt, text_content, overwrite=False)
-
+        link_response = disk_api.get_upload_link(file_txt, overwrite=False)
+        assert link_response.status_code == HTTPStatus.OK, (
+            f"Expected status {HTTPStatus.OK}, "
+            f"actual {link_response.status_code}"
+        )
+        upload_link = UploadLink.model_validate(link_response.json())
+        upload_response = disk_api.upload_to_link(
+            upload_link.href, text_content)
         assert upload_response.status_code == HTTPStatus.CREATED, (
             f"Expected status {HTTPStatus.CREATED}, "
             f"actual {upload_response.status_code}"
@@ -68,13 +77,13 @@ class TestDiskApi:
             "Step 5: open file in new tab and compare text with expected. Close new tab")
         disk_page.open_text_in_new_tab(file_txt)
 
-        BrowserServices.Instance.browser.tabs.switch_to_last_tab()
+        BrowserUtils.switch_to_last_tab()
         viewer = DocViewerPage()
         assert viewer.state.wait_for_displayed(), (
             f"{viewer.name} is not opened"
         )
         assert viewer.get_file_text() == text_content, "Actual text in file doesn't match expected"
-        BrowserServices.Instance.browser.tabs.close_tab()
+        BrowserUtils.close_current_tab()
 
         logger.info("Step 6: use API to change file from txt to jpg")
         file_img = f"{base_name}.{test_data.ext_after}"
@@ -95,9 +104,18 @@ class TestDiskApi:
         logger.info(
             "Step 8: use API upload jpg with same file name from previous step")
 
-        with open(FileUtils.resource_path(test_data.img_file), "rb") as image:
-            overwrite_response = disk_api.upload_file(
-                file_img, image.read(), overwrite=True)
+        overwrite_link_response = disk_api.get_upload_link(
+            file_img, overwrite=True)
+        assert overwrite_link_response.status_code == HTTPStatus.OK, (
+            f"Expected status {HTTPStatus.OK}, "
+            f"actual {overwrite_link_response.status_code}"
+        )
+        overwrite_link = UploadLink.model_validate(
+            overwrite_link_response.json())
+        overwrite_response = disk_api.upload_to_link(
+            overwrite_link.href,
+            FileUtils.read_resource_bytes(test_data.img_file),
+        )
         assert overwrite_response.status_code == HTTPStatus.CREATED, (
             f"Expected status {HTTPStatus.CREATED}, "
             f"actual {overwrite_response.status_code}"
@@ -107,7 +125,7 @@ class TestDiskApi:
             "Step 9: Open the image and verify that it matches the one uploaded. Close the image")
         disk_page.open_image_original(file_img)
 
-        BrowserServices.Instance.browser.tabs.switch_to_last_tab()
+        BrowserUtils.switch_to_last_tab()
         image_page = ImagePage()
         assert image_page.state.wait_for_displayed(), (
             f"{image_page.name} is not opened"
@@ -115,7 +133,7 @@ class TestDiskApi:
         assert ImageUtils.matches_filename(image_page.get_img_src(), file_img), (
             "Opened image does not match uploaded file"
         )
-        BrowserServices.Instance.browser.tabs.close_tab()
+        BrowserUtils.close_current_tab()
 
         logger.info("Step 10: drag image to trash")
         disk_page.drag_file_to_trash(file_img)
@@ -123,10 +141,17 @@ class TestDiskApi:
 
         logger.info(
             "Step 11: use API to verify that the file from the previous step is in the trash")
-        trash_item = disk_api.find_in_trash(
-            file_img,
-            sort=test_data.trash_sort,
+        trash_response = disk_api.list_trash(sort=TrashSort.DELETED_DESC)
+        assert trash_response.status_code == HTTPStatus.OK, (
+            f"Expected status {HTTPStatus.OK}, "
+            f"actual {trash_response.status_code}"
         )
+        trash_body = TrashListResponse.model_validate(trash_response.json())
+        trash_item = next(
+            (item for item in trash_body.embedded.items if item.name == file_img),
+            None,
+        )
+
         assert trash_item is not None, "File not found in trash"
 
         trash_meta_response = disk_api.get_trash_resource(trash_item.path)

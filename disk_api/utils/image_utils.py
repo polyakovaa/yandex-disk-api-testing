@@ -1,6 +1,6 @@
 from urllib.parse import parse_qs, urlparse
 
-from models.query_params import QueryParams
+from enums.query_params import QueryParams
 
 
 class ImageUtils:

@@ -1,6 +1,6 @@
 from py_selenium_auto.forms.form import Form
 from py_selenium_auto_core.locator.locator import Locator
-from pages.element_attribute import ElementAttribute
+from enums.element_attribute import ElementAttribute
 
 
 class ImagePage(Form):

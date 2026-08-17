@@ -7,7 +7,7 @@ from utils.file_utils import FileUtils
 class LoggerUtils:
     __configured = False
     __log_file: Path | None = None
-    LOG_DIR = "logs"
+    __LOG_DIR = "logs"
     DEFAULT_FILENAME = "disk_api.log"
 
     @classmethod
@@ -15,7 +15,7 @@ class LoggerUtils:
         if cls.__configured:
             return cls.__log_file
 
-        log_dir = FileUtils.find_project_root() / cls.LOG_DIR
+        log_dir = FileUtils.find_project_root() / cls.__LOG_DIR
         log_dir.mkdir(exist_ok=True)
         cls.__log_file = log_dir / filename
 

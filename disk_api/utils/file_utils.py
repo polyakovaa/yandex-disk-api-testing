@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 class FileUtils:
-    _PROJECT_MARKERS = ("pyproject.toml", "requirements.txt")
+    __PROJECT_MARKERS = ("pyproject.toml", "requirements.txt")
     RESOURCES_DIR = "resources"
 
     @classmethod
@@ -11,7 +11,7 @@ class FileUtils:
         if current.is_file():
             current = current.parent
         for parent in [current, *current.parents]:
-            if any((parent / marker).exists() for marker in cls._PROJECT_MARKERS):
+            if any((parent / marker).exists() for marker in cls.__PROJECT_MARKERS):
                 return parent
         raise FileNotFoundError(
             "File not Found by pyproject.toml / requirements.txt")
@@ -19,3 +19,8 @@ class FileUtils:
     @classmethod
     def resource_path(cls, file_name: str) -> Path:
         return cls.find_project_root() / cls.RESOURCES_DIR / file_name
+
+    @classmethod
+    def read_resource_bytes(cls, file_name: str) -> bytes:
+        with open(cls.resource_path(file_name), "rb") as file:
+            return file.read()

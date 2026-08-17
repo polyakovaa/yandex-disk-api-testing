@@ -3,23 +3,22 @@ import requests
 from abc import ABC
 from urllib.parse import urljoin
 from http import HTTPMethod
+from api.headers import Headers
 
 logger = logging.getLogger(__name__)
 
 
 class ApiClient(ABC):
-    AUTHORIZATION = "Authorization"
-    OAUTH_PREFIX = "OAuth"
+    __HEADERS = "headers"
 
     def __init__(self, base_url: str, timeout: int, oauth_token: str):
         self.base_url = base_url
         self.timeout = timeout
         self.oauth_token = oauth_token
 
-    def request(self, method: str, path: str, **kwargs) -> requests.Response:
-        headers = kwargs.pop("headers", {})
-        headers.setdefault(self.AUTHORIZATION,
-                           f"{self.OAUTH_PREFIX} {self.oauth_token}")
+    def _request(self, method: str, path: str, **kwargs) -> requests.Response:
+        headers = {**Headers.default(self.oauth_token),
+                   **kwargs.pop(self.__HEADERS, {})}
         response = requests.request(
             method=method,
             url=urljoin(self.base_url, str(path)),
@@ -35,14 +34,14 @@ class ApiClient(ABC):
         )
         return response
 
-    def get(self, path: str, **kwargs) -> requests.Response:
-        return self.request(HTTPMethod.GET, path, **kwargs)
+    def _get(self, path: str, **kwargs) -> requests.Response:
+        return self._request(HTTPMethod.GET, path, **kwargs)
 
-    def post(self, path: str, json=None, **kwargs) -> requests.Response:
-        return self.request(HTTPMethod.POST, path, json=json, **kwargs)
+    def _post(self, path: str, json=None, **kwargs) -> requests.Response:
+        return self._request(HTTPMethod.POST, path, json=json, **kwargs)
 
-    def put(self, path: str, **kwargs) -> requests.Response:
-        return self.request(HTTPMethod.PUT, path, **kwargs)
+    def _put(self, path: str, **kwargs) -> requests.Response:
+        return self._request(HTTPMethod.PUT, path, **kwargs)
 
-    def delete(self, path: str, **kwargs) -> requests.Response:
-        return self.request(HTTPMethod.DELETE, path, **kwargs)
+    def _delete(self, path: str, **kwargs) -> requests.Response:
+        return self._request(HTTPMethod.DELETE, path, **kwargs)

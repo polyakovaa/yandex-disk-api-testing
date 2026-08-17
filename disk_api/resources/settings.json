@@ -1,6 +1,6 @@
 {
   "startUrl": "https://disk.yandex.ru/",
-  "browserName": "firefox",
+  "browserName": "chrome",
   "isRemote": false,
   "remoteConnectionUtl": "http://localhost:4444/wd/hub",
   "isElementHighlightEnabled": true,
